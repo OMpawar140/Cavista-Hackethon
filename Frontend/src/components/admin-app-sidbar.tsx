@@ -28,9 +28,9 @@ export function AdminAppSidebar({ userName , userEmail, ...props }: AppSidebarPr
         },
         teams: [
             {
-                name: "Acme Inc",
+                name: "Kalyan Doc",
                 logo: GalleryVerticalEnd,
-                plan: "Enterprise",
+                plan: "Healthcare",
             },
         ],
         navMain: [
