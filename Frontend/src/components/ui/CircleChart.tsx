@@ -102,7 +102,7 @@ export function CircleChart() {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Visitors
+                          patients
                         </tspan>
                       </text>
                     )
@@ -118,7 +118,7 @@ export function CircleChart() {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
+          Showing total patients for the last 6 months
         </div>
       </CardFooter>
     </Card>

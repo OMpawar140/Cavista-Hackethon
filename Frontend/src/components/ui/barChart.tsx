@@ -115,11 +115,11 @@ const chartConfig = {
     label: "Page Views",
   },
   desktop: {
-    label: "Desktop",
+    label: "Sasoon Pune",
     color: "hsl(var(--chart-1))",
   },
   mobile: {
-    label: "Mobile",
+    label: "Ruby Hall Pune",
     color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig

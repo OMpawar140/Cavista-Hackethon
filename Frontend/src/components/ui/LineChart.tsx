@@ -77,7 +77,7 @@ export function AdminLineChart() {
                     Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
                 </div>
                 <div className="leading-none text-muted-foreground">
-                    Showing total visitors for the last 6 months
+                    Showing total  patients for the last 6 months
                 </div>
             </CardFooter>
         </Card>

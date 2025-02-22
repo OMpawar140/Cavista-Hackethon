@@ -43,7 +43,7 @@ export function AdminAreaChart() {
       <CardHeader>
         <CardTitle>Area Chart - Stacked</CardTitle>
         <CardDescription>
-          Showing total visitors for the last 6 months
+          Showing total patients for the last 6 months
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-8">
