@@ -59,11 +59,13 @@ const users = [
 export default function PatientSearch() {
     const [searchAadhaar, setSearchAadhaar] = useState("");
     const [selectedUser, setSelectedUser] = useState<any | null>(null);
+    const [error, setError] = useState<String | null>(null);
     const navigate = useNavigate();
 
     const handleSearch = () => {
         const user = users.find((u) => u.aadhaar === searchAadhaar);
         setSelectedUser(user || null);
+        setError(user ? null : "No user found with this Aadhaar number");
         // navigate("/all-patient-details");
 
     };
@@ -89,6 +91,12 @@ export default function PatientSearch() {
                     </button>
                 </div>
 
+                {/* Error Message */}
+                {error && (
+                    <div className="bg-red-100 text-red-600 border border-red-400 rounded-md p-2 mb-4">
+                        {error}
+                    </div>
+                )}
                 {/* User Info */}
                 {selectedUser && (
                     <CardContent className="mt-6">

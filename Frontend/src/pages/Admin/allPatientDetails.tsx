@@ -49,14 +49,14 @@ const initialData: Document[] = [
         id: "doc1",
         date: "2023-01-01",
         type: "Prescription",
-        doctor: "Dr. Smith",
+        doctor: "Dr. Joshi",
         url: "https://firebasestorage.googleapis.com/v0/b/cavista-hackethon.firebasestorage.app/o/Sasoon%20Pune%2FSample-filled-in-MR.pdf?alt=media&token=5f95fcbb-b411-40b0-ae0e-168953373f7a",
     },
     {
         id: "doc2",
         date: "2023-02-01",
         type: "Lab Report",
-        doctor: "Dr. Doe",
+        doctor: "Dr. Verma",
         url: "https://firebasestorage.googleapis.com/v0/b/cavista-hackethon.firebasestorage.app/o/Sasoon%20Pune%2FSample-filled-in-MR.pdf?alt=media&token=5f95fcbb-b411-40b0-ae0e-168953373f7a",
     },
 ];
