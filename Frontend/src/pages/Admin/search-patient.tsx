@@ -17,6 +17,18 @@ const users = [
     pastDiseases: ["Diabetes", "Hypertension"],
     allergies: ["Penicillin"],
     ongoingMedication: ["Metformin", "Amlodipine"],
+    bloodTests: [
+      { test: "Glucose", value: "180 mg/dL", normalRange: "70-140 mg/dL" },
+      { test: "Cholesterol", value: "220 mg/dL", normalRange: "<200 mg/dL" },
+    ],
+    scans: [
+      { type: "Chest X-Ray", date: "2024-01-12", result: "Mild lung infection detected" },
+      { type: "MRI Brain", date: "2023-12-05", result: "No abnormalities detected" },
+    ],
+    upcomingAppointments: [
+      { doctor: "Dr. A. Mehta", specialty: "Cardiologist", date: "2024-03-10", nextStep: "Further ECG test advised" },
+      { doctor: "Dr. R. Gupta", specialty: "Endocrinologist", date: "2024-03-18", nextStep: "Adjust diabetes medication" },
+    ],
   },
   {
     aadhaar: "987654321098",
@@ -29,6 +41,16 @@ const users = [
     pastDiseases: ["Asthma"],
     allergies: ["Peanuts"],
     ongoingMedication: ["Salbutamol"],
+    bloodTests: [
+      { test: "Hemoglobin", value: "12 g/dL", normalRange: "12-16 g/dL" },
+      { test: "Vitamin D", value: "15 ng/mL", normalRange: "30-100 ng/mL (Low)" },
+    ],
+    scans: [
+      { type: "CT Scan - Sinus", date: "2024-02-10", result: "Minor sinus congestion" },
+    ],
+    upcomingAppointments: [
+      { doctor: "Dr. S. Verma", specialty: "Pulmonologist", date: "2024-03-15", nextStep: "Spirometry test recommended" },
+    ],
   },
 ];
 
@@ -76,7 +98,7 @@ export default function PatientSearch() {
               <p><strong>Blood Type:</strong> {selectedUser.bloodType}</p>
             </div>
 
-            {/* Medical Records */}
+            {/* Medical History */}
             <h3 className="mt-4 text-lg font-medium">📋 Medical History</h3>
             <Table className="mt-2 border rounded-md">
               <TableHeader>
@@ -100,12 +122,50 @@ export default function PatientSearch() {
                 </TableRow>
               </TableBody>
             </Table>
-          </CardContent>
-        )}
 
-        {/* No results */}
-        {searchAadhaar && !selectedUser && (
-          <p className="mt-4 text-red-500 text-center">No patient found for this Aadhaar number.</p>
+            {/* Blood Test Results */}
+            <h3 className="mt-4 text-lg font-medium">🩸 Blood Test Results</h3>
+            <Table className="mt-2 border rounded-md">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Test</TableHead>
+                  <TableHead>Result</TableHead>
+                  <TableHead>Normal Range</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {selectedUser.bloodTests.map((test: any, index: number) => (
+                  <TableRow key={index}>
+                    <TableCell>{test.test}</TableCell>
+                    <TableCell>{test.value}</TableCell>
+                    <TableCell>{test.normalRange}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {/* Scans & Imaging */}
+            <h3 className="mt-4 text-lg font-medium">🖼️ Scans & Imaging</h3>
+            <ul className="mt-2 list-disc pl-5">
+              {selectedUser.scans.map((scan: any, index: number) => (
+                <li key={index}>
+                  <strong>{scan.type}</strong> - {scan.date} ({scan.result})
+                </li>
+              ))}
+            </ul>
+
+            {/* Upcoming Appointments */}
+            <h3 className="mt-4 text-lg font-medium">📅 Upcoming Appointments</h3>
+            <ul className="mt-2 list-disc pl-5">
+              {selectedUser.upcomingAppointments.map((appt: any, index: number) => (
+                <li key={index}>
+                  <strong>{appt.doctor} ({appt.specialty})</strong> - {appt.date}  
+                  <br />
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Next Step: {appt.nextStep}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
         )}
       </Card>
     </div>
