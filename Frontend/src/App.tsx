@@ -6,11 +6,13 @@ import ProtectedRoute from './components/protectedRoute';
 import NotFound from "./components/404.tsx";
 import  { Suspense, lazy } from 'react';
 
+
 const LoginPage = lazy(() => import('./pages/Authentication/LoginPage'));
 const SignUp = lazy(() => import('./pages/Authentication/SignUp'));
 const AdminDashboard = lazy(() => import("./pages/Admin/adminDashboard"));
 const AdminPanel = lazy(() => import("./pages/Admin/LiveUsers"));
-const AddNewPatient = lazy(() => import('./pages/Admin/AddNewPatient'));
+const Searchuser = lazy(() => import("./pages/Admin/search-patient"));
+const Adduser = lazy(() => import("./pages/Admin/AddNewPatient"));
 
 export default function App() {
   return (
@@ -26,10 +28,11 @@ export default function App() {
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route path="/addnewuser" element={<AddNewPatient />} />
               <Route path="/page-not-found" element={<NotFound />} />
               <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route path="/manage-users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+              <Route path="/Search-User" element={<ProtectedRoute><Searchuser /></ProtectedRoute>} />
+              <Route path="/Add-User" element={<ProtectedRoute><Adduser /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/login" />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
