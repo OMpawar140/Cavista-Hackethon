@@ -1,5 +1,5 @@
 import * as React from "react"
-import { GalleryVerticalEnd, SquareTerminal, Book, Search } from "lucide-react"
+import { GalleryVerticalEnd, SquareTerminal, Book, Search,CirclePlus} from "lucide-react"
 import { AdminNavMain } from "@/components/admin-nav-main"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -50,6 +50,12 @@ export function AdminAppSidebar({ userName , userEmail, ...props }: AppSidebarPr
                 title: <Link to={`/Search-User`}>Search Users</Link>,
                 url: "/admin/Search-User",
                 icon: Search, 
+                isActive: false,
+            },
+            {
+                title: <Link to={`/addnewuser`}>Add New User</Link>,
+                url: "/admin/addnewuser",
+                icon:CirclePlus, 
                 isActive: false,
             }
         ],

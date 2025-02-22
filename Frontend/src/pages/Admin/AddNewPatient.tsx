@@ -14,6 +14,11 @@ export default function AddNewPatient() {
   const [pastDiseases, setPastDiseases] = useState("");
   const [allergies, setAllergies] = useState("");
   const [ongoingMedication, setOngoingMedication] = useState("");
+  const [bloodPressure, setBloodPressure] = useState("");
+  const [heartRate, setHeartRate] = useState("");
+  const [respiratoryRate, setRespiratoryRate] = useState("");
+  const [temperature, setTemperature] = useState("");
+  const [oxygenSaturation, setOxygenSaturation] = useState("");
 
   const handleAddPatient = () => {
     console.log({
@@ -28,6 +33,11 @@ export default function AddNewPatient() {
       pastDiseases: pastDiseases.split(","),
       allergies: allergies.split(","),
       ongoingMedication: ongoingMedication.split(","),
+      bloodPressure,
+      heartRate,
+      respiratoryRate,
+      temperature,
+      oxygenSaturation,
     });
   };
 
@@ -38,7 +48,7 @@ export default function AddNewPatient() {
         
         <form className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="name" className="block text-sm font-medium dark:text-white pr-10">
               Name
             </label>
             <Input
@@ -50,7 +60,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="block text-sm font-medium dark:text-white pr-10">
               Email
             </label>
             <Input
@@ -62,7 +72,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="aadhaar" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="aadhaar" className="block text-sm font-medium dark:text-white pr-10">
               Aadhaar Number
             </label>
             <Input
@@ -74,7 +84,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="age" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="age" className="block text-sm font-medium dark:text-white pr-10">
               Age
             </label>
             <Input
@@ -86,7 +96,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="city" className="block text-sm font-medium dark:text-white pr-10">
               City
             </label>
             <Input
@@ -98,7 +108,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="dob" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="dob" className="block text-sm font-medium dark:text-white pr-10">
               Date of Birth
             </label>
             <Input
@@ -110,7 +120,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="mobile" className="block text-sm font-medium dark:text-white pr-10">
               Mobile No
             </label>
             <Input
@@ -122,7 +132,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="bloodType" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="bloodType" className="block text-sm font-medium dark:text-white pr-10">
               Blood Type
             </label>
             <Input
@@ -134,7 +144,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="pastDiseases" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="pastDiseases" className="block text-sm font-medium dark:text-white pr-10">
               Past Diseases (comma separated)
             </label>
             <Input
@@ -146,7 +156,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="allergies" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="allergies" className="block text-sm font-medium dark:text-white pr-10">
               Allergies (comma separated)
             </label>
             <Input
@@ -158,7 +168,7 @@ export default function AddNewPatient() {
             />
           </div>
           <div>
-            <label htmlFor="ongoingMedication" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="ongoingMedication" className="block text-sm font-medium dark:text-white pr-10">
               Ongoing Medication (comma separated)
             </label>
             <Input
@@ -166,6 +176,99 @@ export default function AddNewPatient() {
               id="ongoingMedication"
               value={ongoingMedication}
               onChange={(e) => setOngoingMedication(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="bloodPressure" className="block text-sm font-medium dark:text-white pr-10">
+              Blood Pressure (BP)
+            </label>
+            <Input
+              type="text"
+              id="bloodPressure"
+              value={bloodPressure}
+              onChange={(e) => setBloodPressure(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="heartRate" className="block text-sm font-medium dark:text-white pr-10">
+              Heart Rate (Pulse)
+            </label>
+            <Input
+              type="text"
+              id="heartRate"
+              value={heartRate}
+              onChange={(e) => setHeartRate(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="respiratoryRate" className="block text-sm font-medium dark:text-white pr-10">
+              Respiratory Rate
+            </label>
+            <Input
+              type="text"
+              id="respiratoryRate"
+              value={respiratoryRate}
+              onChange={(e) => setRespiratoryRate(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="temperature" className="block text-sm font-medium dark:text-white pr-10">
+              Temperature
+            </label>
+            <Input
+              type="text"
+              id="temperature"
+              value={temperature}
+              onChange={(e) => setTemperature(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="oxygenSaturation" className="block text-sm font-medium dark:text-white pr-10">
+              Oxygen Saturation (SpO₂)
+            </label>
+            <Input
+              type="text"
+              id="oxygenSaturation"
+              value={oxygenSaturation}
+              onChange={(e) => setOxygenSaturation(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="bloodReport" className="block text-sm font-medium dark:text-white pr-10">
+              Upload Blood Report
+            </label>
+            <Input
+              type="file"
+              id="bloodReport"
+              onChange={(e) => setBloodReport(e.target.files[0])}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="prescription" className="block text-sm font-medium dark:text-white pr-10">
+              Upload Prescription
+            </label>
+            <Input
+              type="file"
+              id="prescription"
+              onChange={(e) => setPrescription(e.target.files[0])}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div>
+            <label htmlFor="scans" className="block text-sm font-medium dark:text-white pr-10">
+              Upload Scans
+            </label>
+            <Input
+              type="file"
+              id="scans"
+              onChange={(e) => setScans(e.target.files[0])}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
