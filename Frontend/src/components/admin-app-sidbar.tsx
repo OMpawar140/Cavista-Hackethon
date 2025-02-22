@@ -1,5 +1,5 @@
 import * as React from "react"
-import { GalleryVerticalEnd, SquareTerminal, Book } from "lucide-react"
+import { GalleryVerticalEnd, SquareTerminal, Book, Search } from "lucide-react"
 import { AdminNavMain } from "@/components/admin-nav-main"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -18,7 +18,6 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 }
 
 export function AdminAppSidebar({ userName , userEmail, ...props }: AppSidebarProps) {
-
 
     // Sidebar Data Structure
     const sidebarData = {
@@ -47,6 +46,12 @@ export function AdminAppSidebar({ userName , userEmail, ...props }: AppSidebarPr
                 icon: Book,
                 isActive: false,
             },
+            {
+                title: <Link to={`/Search-User`}>Search Users</Link>,
+                url: "/admin/Search-User",
+                icon: Search, 
+                isActive: false,
+            }
         ],
     };
 
