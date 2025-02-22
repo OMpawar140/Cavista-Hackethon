@@ -12,7 +12,7 @@ const SignUp = lazy(() => import('./pages/Authentication/SignUp'));
 const AdminDashboard = lazy(() => import("./pages/Admin/adminDashboard"));
 const AdminPanel = lazy(() => import("./pages/Admin/LiveUsers"));
 const Searchuser = lazy(() => import("./pages/Admin/searchuser-layout.tsx"));
-const AddNewPatient = lazy(() => import('./pages/Admin/AddNewPatient'));
+const AddNewPatient = lazy(() => import('./pages/Admin/adduser-layout.tsx'));
 
 export default function App() {
   return (
