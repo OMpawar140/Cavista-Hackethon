@@ -101,24 +101,36 @@ export default function PatientSearch() {
                 {selectedUser && (
                     <CardContent className="mt-6">
                         <div className="flex justify-between items-start">
-                            <div>
-                                <h2 className="text-xl font-medium mb-2">🧑‍⚕️ Patient Details</h2>
-                                <div className="space-y-2">
-                                    <p><strong>Name:</strong> {selectedUser.name}</p>
-                                    <p><strong>Age:</strong> {selectedUser.age}</p>
-                                    <p><strong>City:</strong> {selectedUser.city}</p>
-                                    <p><strong>Date of Birth:</strong> {selectedUser.dob}</p>
-                                    <p><strong>Mobile No:</strong> {selectedUser.mobile}</p>
-                                    <p><strong>Blood Type:</strong> {selectedUser.bloodType}</p>
-                                </div>
-                            </div>
-                            <Button 
-                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                onClick={() => navigate("/all-patient-details")}
-                            >
-                                View All Details
-                            </Button>
-                        </div>
+    <div>
+        <h2 className="text-xl font-medium mb-2">🧑‍⚕️ Patient Details</h2>
+        <div className="space-y-2">
+            <p><strong>Name:</strong> {selectedUser.name}</p>
+            <p><strong>Age:</strong> {selectedUser.age}</p>
+            <p><strong>City:</strong> {selectedUser.city}</p>
+            <p><strong>Date of Birth:</strong> {selectedUser.dob}</p>
+            <p><strong>Mobile No:</strong> {selectedUser.mobile}</p>
+            <p><strong>Blood Type:</strong> {selectedUser.bloodType}</p>
+        </div>
+    </div>
+    
+    {/* Buttons for New Prescription and View All Details */}
+    <div className="flex gap-2">
+        <Button 
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => navigate(`/new-prescription/${selectedUser.aadhaar}`)}
+        >
+            ➕ New Prescription
+        </Button>
+
+        <Button 
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => navigate("/all-patient-details")}
+        >
+            View All Details
+        </Button>
+    </div>
+</div>
+
 
                         {/* Medical History */}
                         <h3 className="mt-4 text-lg font-medium">📋 Medical History</h3>

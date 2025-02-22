@@ -14,6 +14,7 @@ const AdminPanel = lazy(() => import("./pages/Admin/LiveUsers"));
 const Searchuser = lazy(() => import("./pages/Admin/searchuser-layout.tsx"));
 const Patient_Details = lazy(() => import("./pages/Admin/allpatientLayout.tsx"));
 const AddNewPatient = lazy(() => import('./pages/Admin/adduser-layout.tsx'));
+const NewPrescip = lazy(() => import('./pages/Admin/NewPrescriptionlaypout.tsx'));
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
               <Route  path="/manage-users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
               <Route path="/Search-User" element={<ProtectedRoute><Searchuser /></ProtectedRoute>} />
               <Route path="/all-patient-details" element={<ProtectedRoute><Patient_Details /></ProtectedRoute>} />
+              <Route path="/new-prescription/:aadhaar" element={<ProtectedRoute><NewPrescip /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/login" />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
