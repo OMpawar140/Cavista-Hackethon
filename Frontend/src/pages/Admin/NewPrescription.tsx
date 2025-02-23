@@ -5,12 +5,25 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { db, imgDB } from "../../Database/FirebaseConfig";
+import { ref, uploadString, getDownloadURL } from "firebase/storage"; // Import getDownloadURL to fetch the file URL
+import { doc, updateDoc, getDoc } from "firebase/firestore";
+import CryptoJS from "crypto-js";
+import jsPDF from "jspdf"; 
+import Swal from "sweetalert2"; 
 
 export default function NewPrescription() {
     const navigate = useNavigate();
     const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
-    const aadhaar = queryParams.get("aadhaar");
+
+    const aadhaarFromState = location.state?.aadhaar || '';
+    const aadhaarEncrypted = aadhaarFromState;
+    const decryptedAadhaar = CryptoJS.SHA256(aadhaarEncrypted).toString();
+
+    const maskedAadhaar = () => {
+        const lastFour = aadhaarEncrypted.slice(-4);
+        return "xxxxxxxx" + lastFour;
+    };
 
     const [prescription, setPrescription] = useState({
         symptoms: "",
@@ -24,32 +37,95 @@ export default function NewPrescription() {
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setPrescription({ ...prescription, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setPrescription((prev) => ({ ...prev, [name]: value }));
     };
 
-    type MedicationField = "name" | "dose" | "timeToEat";
-
-    const handleMedicationChange = (index: number, field: MedicationField, value: string) => {
+    const handleMedicationChange = (index: number, field: keyof typeof prescription.medications[number], value: string) => {
         const updatedMeds = [...prescription.medications];
         updatedMeds[index][field] = value;
-        setPrescription({ ...prescription, medications: updatedMeds });
+        setPrescription((prev) => ({ ...prev, medications: updatedMeds }));
     };
 
     const addMedication = () => {
-        setPrescription({
-            ...prescription,
-            medications: [...prescription.medications, { name: "", dose: "", timeToEat: "" }],
-        });
+        setPrescription((prev) => ({
+            ...prev,
+            medications: [...prev.medications, { name: "", dose: "", timeToEat: "" }],
+        }));
     };
 
     const removeMedication = (index: number) => {
         const updatedMeds = prescription.medications.filter((_, i) => i !== index);
-        setPrescription({ ...prescription, medications: updatedMeds });
+        setPrescription((prev) => ({ ...prev, medications: updatedMeds }));
     };
 
-    const handleSubmit = () => {
-        console.log("Prescription submitted:", prescription);
-        navigate("/patient-search"); // Redirecting back after submission
+    const generateAndUploadPDF = async () => {
+        const doc = new jsPDF();
+
+        // PDF content
+        doc.text(`Aadhaar No: ${maskedAadhaar()}`, 10, 10);
+        doc.text(`Symptoms: ${prescription.symptoms}`, 10, 20);
+        doc.text(`Diagnosis: ${prescription.diagnosis}`, 10, 30);
+        doc.text(`Height: ${prescription.height}`, 10, 40);
+        doc.text(`Weight: ${prescription.weight}`, 10, 50);
+        doc.text(`Blood Group: ${prescription.bloodGroup}`, 10, 60);
+        prescription.medications.forEach((med, index) => {
+            doc.text(`Medication ${index + 1}: ${med.name}, Dose: ${med.dose}, Time: ${med.timeToEat}`, 10, 70 + (index * 10));
+        });
+        doc.text(`Next Appointment with ${prescription.nextAppointment.doctor} (${prescription.nextAppointment.specialty}) on ${prescription.nextAppointment.date}`, 10, 90);
+        doc.text(`Doctor Notes: ${prescription.doctorNotes}`, 10, 100);
+
+        const pdfData = doc.output('datauristring');
+        const pdfBlob = pdfData.split(',')[1];
+        const pdfRef = ref(imgDB, `Sasoon Pune/prescription_${aadhaarEncrypted}_${Date.now()}.pdf`);
+
+        // Upload the PDF data to Firebase Storage
+        await uploadString(pdfRef, pdfBlob, 'base64', { contentType: 'application/pdf' });
+
+        // Fetch the download URL of the uploaded PDF
+        const downloadURL = await getDownloadURL(pdfRef);
+        return downloadURL; // This will return the URL for the uploaded PDF
+    };
+
+    const handleSubmit = async () => {
+        try {
+            const pdfUrl = await generateAndUploadPDF(); // Store the returned PDF URL
+            const patientDocRef = doc(db, "patients", decryptedAadhaar);
+            const patientDoc = await getDoc(patientDocRef);
+
+            const doctorName = prescription.nextAppointment.doctor;
+            const prescriptionType = `Prescription_${Date.now()}_${doctorName}`;
+            const date = prescription.nextAppointment.date;
+
+            const fileDetails = {
+                url: pdfUrl, // Use the pdfUrl here
+                doctor: doctorName,
+                type: prescriptionType,
+                date,
+            };
+
+            // Update the patient document with the new file URL
+            await updateDoc(patientDocRef, {
+                fileUrls: [...(patientDoc.data()?.fileUrls ?? []), fileDetails],
+            });
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'Uploaded!',
+                text: 'File has been uploaded successfully.',
+                confirmButtonText: 'OK'
+            });
+            console.log("Prescription submitted:", prescription);
+            navigate(`/all-patient-details/${decryptedAadhaar}` , { state: { aadhaar: decryptedAadhaar } });
+        } catch (error) {
+            console.error("Error uploading PDF:", error);
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to upload the prescription. Please try again.',
+                confirmButtonText: 'OK'
+            });
+        }
     };
 
     return (
@@ -58,9 +134,8 @@ export default function NewPrescription() {
                 <h1 className="text-2xl font-semibold text-center mb-4">📝 New Prescription</h1>
 
                 <CardContent className="space-y-4">
-                    <p className="text-lg font-medium">Aadhaar No: {aadhaar}</p>
+                    <p className="text-lg font-medium">Aadhaar No: {maskedAadhaar()}</p>
 
-                    {/* Symptoms */}
                     <Input
                         type="text"
                         name="symptoms"
@@ -70,7 +145,6 @@ export default function NewPrescription() {
                         className="p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
                     />
 
-                    {/* Diagnosis */}
                     <Input
                         type="text"
                         name="diagnosis"
@@ -80,7 +154,6 @@ export default function NewPrescription() {
                         className="p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
                     />
 
-                    {/* Height & Weight */}
                     <div className="flex gap-4">
                         <Input
                             type="text"
@@ -100,8 +173,7 @@ export default function NewPrescription() {
                         />
                     </div>
 
-                    {/* Blood Group */}
-                    <Select onValueChange={(value) => setPrescription({ ...prescription, bloodGroup: value })}>
+                    <Select onValueChange={(value) => setPrescription((prev) => ({ ...prev, bloodGroup: value }))}>
                         <SelectTrigger className="w-full p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700">
                             <SelectValue placeholder="Select Blood Group" />
                         </SelectTrigger>
@@ -114,7 +186,6 @@ export default function NewPrescription() {
                         </SelectContent>
                     </Select>
 
-                    {/* Medications List */}
                     <h3 className="text-lg font-medium">💊 Medications</h3>
                     {prescription.medications.map((med, index) => (
                         <div key={index} className="flex gap-2 items-center">
@@ -144,7 +215,6 @@ export default function NewPrescription() {
                     ))}
                     <Button className="mt-2 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded" onClick={addMedication}>➕ Add Medication</Button>
 
-                    {/* Next Appointment */}
                     <h3 className="text-lg font-medium">📅 Next Appointment</h3>
                     <div className="flex gap-4">
                         <Input
@@ -152,7 +222,7 @@ export default function NewPrescription() {
                             name="doctor"
                             placeholder="Doctor's Name"
                             value={prescription.nextAppointment.doctor}
-                            onChange={(e) => setPrescription({ ...prescription, nextAppointment: { ...prescription.nextAppointment, doctor: e.target.value } })}
+                            onChange={(e) => setPrescription((prev) => ({ ...prev, nextAppointment: { ...prev.nextAppointment, doctor: e.target.value } }))}
                             className="p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
                         />
                         <Input
@@ -160,7 +230,7 @@ export default function NewPrescription() {
                             name="specialty"
                             placeholder="Specialty (e.g., Cardiologist)"
                             value={prescription.nextAppointment.specialty}
-                            onChange={(e) => setPrescription({ ...prescription, nextAppointment: { ...prescription.nextAppointment, specialty: e.target.value } })}
+                            onChange={(e) => setPrescription((prev) => ({ ...prev, nextAppointment: { ...prev.nextAppointment, specialty: e.target.value } }))}
                             className="p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
                         />
                     </div>
@@ -168,20 +238,11 @@ export default function NewPrescription() {
                         type="date"
                         name="date"
                         value={prescription.nextAppointment.date}
-                        onChange={(e) => setPrescription({ ...prescription, nextAppointment: { ...prescription.nextAppointment, date: e.target.value } })}
+                        onChange={(e) => setPrescription((prev) => ({ ...prev, nextAppointment: { ...prev.nextAppointment, date: e.target.value } }))}
                         className="p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
                     />
 
-                    {/* Doctor Notes */}
                     <h3 className="text-lg font-medium">📝 Doctor Notes</h3>
-                    <Select onValueChange={(value) => setPrescription({ ...prescription, doctorNotes: value })}>
-                        <SelectTrigger className="w-full p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                            <SelectValue placeholder="Select N/A or enter manually" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="N/A">N/A</SelectItem>
-                        </SelectContent>
-                    </Select>
                     <Textarea name="doctorNotes" value={prescription.doctorNotes} onChange={handleChange} placeholder="Enter Notes" className="p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700" />
 
                     <Button className="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" onClick={handleSubmit}>✅ Submit Prescription</Button>

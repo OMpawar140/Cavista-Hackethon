@@ -30,12 +30,12 @@ export default function App() {
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignUp />} />
-              <Route path="/addnewuser" element={<AddNewPatient />} />
+              <Route path="/addnewuser" element={<ProtectedRoute><AddNewPatient /></ProtectedRoute>} />
               <Route path="/page-not-found" element={<NotFound />} />
               <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
               <Route  path="/manage-users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
               <Route path="/Search-User" element={<ProtectedRoute><Searchuser /></ProtectedRoute>} />
-              <Route path="/all-patient-details" element={<ProtectedRoute><Patient_Details /></ProtectedRoute>} />
+              <Route path="/all-patient-details/:aadhaar" element={<ProtectedRoute><Patient_Details /></ProtectedRoute>} />
               <Route path="/new-prescription/:aadhaar" element={<ProtectedRoute><NewPrescip /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/login" />} />
               <Route path="*" element={<NotFound />} />

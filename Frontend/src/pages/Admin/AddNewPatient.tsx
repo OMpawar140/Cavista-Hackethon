@@ -1,8 +1,15 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { db } from "../../Database/FirebaseConfig";  
+import { doc, setDoc } from "firebase/firestore";
+import CryptoJS from "crypto-js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import Swal from "sweetalert2"; 
+import { useNavigate } from "react-router-dom"; 
 
 export default function AddNewPatient() {
+  const navigate = useNavigate(); // Initialize useRouter for navigation
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [aadhaar, setAadhaar] = useState("");
@@ -19,26 +26,107 @@ export default function AddNewPatient() {
   const [respiratoryRate, setRespiratoryRate] = useState("");
   const [temperature, setTemperature] = useState("");
   const [oxygenSaturation, setOxygenSaturation] = useState("");
+  const [bloodReport, setBloodReport] = useState<File | null>(null);
+  const [prescription, setPrescription] = useState<File | null>(null);
+  const [scans, setScans] = useState<File | null>(null);
 
-  const handleAddPatient = () => {
-    console.log({
-      name,
-      email,
-      aadhaar,
-      age,
-      city,
-      dob,
-      mobile,
-      bloodType,
-      pastDiseases: pastDiseases.split(","),
-      allergies: allergies.split(","),
-      ongoingMedication: ongoingMedication.split(","),
-      bloodPressure,
-      heartRate,
-      respiratoryRate,
-      temperature,
-      oxygenSaturation,
-    });
+  const storage = getStorage(); // Initialize Firebase Storage
+
+  const handleAddPatient = async () => {
+    try {
+      const hashedAadhaar = CryptoJS.SHA256(aadhaar).toString();
+      const fileUrls: string[] = [];
+
+      // Function to upload files and get URLs
+      const uploadFileAndGetUrl = async (file: File | null, folder: string) => {
+        if (!file) return null;
+        const fileRef = ref(storage, `${folder}/${file.name}`);
+        await uploadBytes(fileRef, file);
+        return await getDownloadURL(fileRef);
+      };
+
+      // Upload files and get URLs
+      const bloodReportUrl = await uploadFileAndGetUrl(bloodReport, 'Sasoon Pune');
+      if (bloodReportUrl) fileUrls.push(bloodReportUrl);
+
+      const prescriptionUrl = await uploadFileAndGetUrl(prescription, 'Sasoon Pune');
+      if (prescriptionUrl) fileUrls.push(prescriptionUrl);
+      
+      const scansUrl = await uploadFileAndGetUrl(scans, 'Sasoon Pune');
+      if (scansUrl) fileUrls.push(scansUrl);
+
+      // Create patient object
+      const patientData = {
+        name,
+        email,
+        aadhaar,
+        age,
+        city,
+        dob,
+        mobile,
+        bloodType,
+        pastDiseases: pastDiseases.split(","),
+        allergies: allergies.split(","),
+        ongoingMedication: ongoingMedication.split(","),
+        bloodPressure,
+        heartRate,
+        respiratoryRate,
+        temperature,
+        oxygenSaturation,
+        fileUrls, 
+      };
+
+      // Save to Firestore
+      await setDoc(doc(db, "patients", hashedAadhaar), patientData);
+      
+      console.log("Patient added successfully:", patientData);
+      
+      // Show success alert
+      await Swal.fire({
+        title: 'Success!',
+        text: 'Patient has been added successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      });
+      
+      // Navigate to /Search-User
+     navigate('/Search-User');
+      
+      // Reset input fields
+      resetForm();
+      
+    } catch (error) {
+      console.error("Error adding patient: ", error);
+      await Swal.fire({
+        title: 'Error!',
+        text: 'There was an error adding the patient.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+    }
+  };
+
+  // Function to reset form
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setAadhaar("");
+    setAge("");
+    setCity("");
+    setDob("");
+    setMobile("");
+    setBloodType("");
+    setPastDiseases("");
+    setAllergies("");
+    setOngoingMedication("");
+    setBloodPressure("");
+    setHeartRate("");
+    setRespiratoryRate("");
+    setTemperature("");
+    setOxygenSaturation("");
+    setBloodReport(null);
+    setPrescription(null);
+    setScans(null);
   };
 
   return (
@@ -47,6 +135,8 @@ export default function AddNewPatient() {
         <h1 className="text-2xl font-semibold text-center mb-4">🧑‍⚕ Add New Patient</h1>
         
         <form className="space-y-4">
+          {/* All your input fields remain unchanged here */}
+          {/* ... Same as before */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium dark:text-white pr-10">
               Name
@@ -246,7 +336,7 @@ export default function AddNewPatient() {
             <Input
               type="file"
               id="bloodReport"
-              onChange={(e) => setBloodReport(e.target.files[0])}
+              onChange={(e) => setBloodReport(e.target.files ? e.target.files[0] : null)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
@@ -257,7 +347,7 @@ export default function AddNewPatient() {
             <Input
               type="file"
               id="prescription"
-              onChange={(e) => setPrescription(e.target.files[0])}
+              onChange={(e) => setPrescription(e.target.files ? e.target.files[0] : null)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
@@ -268,7 +358,7 @@ export default function AddNewPatient() {
             <Input
               type="file"
               id="scans"
-              onChange={(e) => setScans(e.target.files[0])}
+              onChange={(e) => setScans(e.target.files ? e.target.files[0] : null)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
             />
           </div>
