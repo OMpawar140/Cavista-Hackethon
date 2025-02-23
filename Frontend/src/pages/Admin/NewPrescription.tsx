@@ -12,6 +12,11 @@ import CryptoJS from "crypto-js";
 import jsPDF from "jspdf"; 
 import Swal from "sweetalert2"; 
 
+import { Trash } from "lucide-react";
+
+
+
+
 export default function NewPrescription() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -58,6 +63,110 @@ export default function NewPrescription() {
         const updatedMeds = prescription.medications.filter((_, i) => i !== index);
         setPrescription((prev) => ({ ...prev, medications: updatedMeds }));
     };
+
+    const checkWithModel = async () => {
+        const selectedUser = { aadhaar: decryptedAadhaar };
+        if (!selectedUser.aadhaar) {
+            await Swal.fire({
+                icon: "warning",
+                title: "Patient Data Missing",
+                text: "No patient data found. Please select a valid patient.",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+    
+        try {
+            // Reference the document using the hashed Aadhaar as the ID
+            const patientDocRef = doc(db, "patients", selectedUser.aadhaar);
+            const patientDocSnap = await getDoc(patientDocRef);
+    
+            if (!patientDocSnap.exists()) {
+                await Swal.fire({
+                    icon: "warning",
+                    title: "Patient Not Found",
+                    text: "No data found for this patient.",
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+    
+            const patientData = patientDocSnap.data();
+            const pastMedications = patientData.ongoingMedication || [];
+            console.log("Patient medications:", pastMedications);
+    
+            const newMedications = prescription.medications
+                .map((med) => med.name)
+                .filter((name) => name.trim() !== "");
+    
+            if (newMedications.length < 1 || pastMedications.length < 1) {
+                await Swal.fire({
+                    icon: "warning",
+                    title: "Insufficient Data",
+                    text: "Provide at least one new medicine and one past medicine.",
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+    
+            const allMedications = [...newMedications, ...pastMedications];
+    
+            // 🔴 Hardcoded Conflict Pairs
+            const conflictPairs = [
+                ["Monoamine", "Serotonin"],
+                ["Ceftriaxone", "Lansoprazole"]
+            ];
+    
+            let detectedConflicts = [];
+    
+            for (const [med1, med2] of conflictPairs) {
+                if (allMedications.includes(med1) && allMedications.includes(med2)) {
+                    detectedConflicts.push(`${med1} ↔ ${med2}`);
+                }
+            }
+    
+            if (detectedConflicts.length > 0) {
+                await Swal.fire({
+                    icon: "error",
+                    title: "Hardcoded Conflict Detected!",
+                    html: `<b>Conflicting Pairs:</b><br>${detectedConflicts.join("<br>")}`,
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+    
+            // Proceed with API Call
+            const response = await fetch("http://127.0.0.1:3000/check_interactions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ medications: allMedications }),
+            });
+    
+            const data = await response.json();
+    
+            await Swal.fire({
+                icon: data.conflict ? "error" : "success",
+                title: data.conflict ? "Conflict Detected!" : "No Conflict",
+                text: data.message || "No significant interactions found.",
+                confirmButtonText: "OK",
+            });
+        } catch (error) {
+            console.error("Error fetching patient medications:", error);
+            await Swal.fire({
+                icon: "error",
+                title: "Error!",
+                text: "Failed to check medicine conflict.",
+                confirmButtonText: "OK",
+            });
+        }
+    };
+    
+    
+    
+    
+    
+
+    
 
     const generateAndUploadPDF = async () => {
         const doc = new jsPDF();
@@ -186,7 +295,11 @@ export default function NewPrescription() {
                         </SelectContent>
                     </Select>
 
-                    <h3 className="text-lg font-medium">💊 Medications</h3>
+                    <h3 className="text-lg font-medium"> Medications</h3>
+                    <Button className="mt-2 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded" onClick={checkWithModel}>
+                        drug-drug interaction" (DDI) 
+                    </Button>
+
                     {prescription.medications.map((med, index) => (
                         <div key={index} className="flex gap-2 items-center">
                             <Input
@@ -210,8 +323,13 @@ export default function NewPrescription() {
                                 onChange={(e) => handleMedicationChange(index, "timeToEat", e.target.value)}
                                 className="p-3 border rounded-md bg-gray-200 dark:bg-gray-800 dark:border-gray-700"
                             />
-                            <Button className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded" onClick={() => removeMedication(index)}>❌</Button>
-                        </div>
+                            <Button
+                                className="bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded flex items-center gap-1"
+                                onClick={() => removeMedication(index)}
+                            >
+                                <Trash className="w-4 h-4" /> 
+                            </Button>
+                                                    </div>
                     ))}
                     <Button className="mt-2 bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded" onClick={addMedication}>➕ Add Medication</Button>
 
