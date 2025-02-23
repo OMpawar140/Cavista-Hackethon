@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";``
 import { useNavigate } from "react-router-dom";
 import { db } from "../../Database/FirebaseConfig"; 
 import { doc, getDoc, updateDoc } from "firebase/firestore"; 
@@ -152,12 +152,12 @@ export default function PatientSearch() {
                             
                             {/* Buttons for New Prescription and View All Details */}
                             <div className="flex gap-2">
-                                <Button 
-                                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                                    onClick={() => navigate(`/new-prescription/${selectedUser.aadhaar}`, { state: { aadhaar: searchAadhaar } })}
-                                >
-                                    ➕ New Prescription
-                                </Button>   
+                            <Button 
+                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={() => navigate(`/new-prescription/${selectedUser.aadhaar}`, { state: { aadhaar: searchAadhaar, selectedUser } })} // Pass selectedUser
+                            >
+                                ➕ New Prescription
+                            </Button> 
 
                                 <Button 
                                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
