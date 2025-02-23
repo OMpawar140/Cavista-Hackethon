@@ -1,13 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from main import summarize_pdfs  # Import your summarize function
+from main import summarize_pdfs  
 
 app = Flask(__name__)
 
-# Enable CORS for all routes and origins
 CORS(app)
 
-latest_summary = None  # Store the latest summary JSON
+latest_summary = None  
 
 @app.route("/summarize", methods=["POST"])
 def summarize():
@@ -19,7 +18,7 @@ def summarize():
         if not pdf_urls:
             return jsonify({"error": "No PDF URLs provided"}), 400
 
-        # Call the summarizer function from main.py
+      
         json_data = summarize_pdfs(pdf_urls)
 
         if "error" not in json_data:

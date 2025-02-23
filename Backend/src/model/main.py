@@ -1,9 +1,9 @@
 import os
-import fitz  # PyMuPDF
+import fitz 
 import json
 import requests
 import google.generativeai as genai
-# Configure Gemini API
+
 genai.configure(api_key="AIzaSyDZr8Jv90UvuFytin_2JXTC8GwEYpt3YxU")
 
 generation_config = {
@@ -36,7 +36,7 @@ def extract_text_from_pdf(pdf_path):
 
 
 def generate_summary_with_gemini(text):
-    # Enhanced prompt
+    
     prompt = f"""
     You are a highly skilled medical assistant with expertise in summarizing patient medical records. Your task is to analyze the provided medical report(s) and extract the following details in a structured JSON format:
 
