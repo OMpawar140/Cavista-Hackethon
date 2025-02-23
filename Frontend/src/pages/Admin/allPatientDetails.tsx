@@ -23,6 +23,8 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ModalProps {
     isOpen: boolean;
@@ -31,63 +33,75 @@ interface ModalProps {
 }
 
 const DocumentViewerModal = ({ isOpen, onClose, url }: ModalProps) => {
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-4 rounded shadow-lg max-w-lg w-full relative">
-                <button
-                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                    onClick={onClose}
-                    aria-label="Close"
-                >
-                    ×
-                </button>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Document Viewer</DialogTitle>
+                    <DialogClose />
+                </DialogHeader>
                 <iframe src={url} width="100%" height="600" style={{ border: "none" }} title="Document Viewer" />
                 <div className="text-right mt-2">
                     <a href={url} target="_blank" rel="noopener noreferrer">
                         <Button variant="outline">Download Document</Button>
                     </a>
                 </div>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 
 // Modal for displaying the summary
-const SummaryModal = ({ isOpen, onClose, summary }: { isOpen: boolean; onClose: () => void; summary: string; }) => {
-    if (!isOpen) return null;
-
+const SummaryModal = ({ isOpen, onClose, summary }: { isOpen: boolean; onClose: () => void; summary: any; }) => {
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-4 rounded shadow-lg max-w-lg w-full relative h-96 overflow-y-auto">
-                <button
-                    className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                    onClick={onClose}
-                    aria-label="Close"
-                >
-                    ×
-                </button>
-                <div className="max-h-full overflow-y-auto">
-                    <h2 className="text-xl font-semibold mb-2">Generated Summary</h2>
-                    <pre className="whitespace-pre-wrap">{summary}</pre> {/* Use <pre> for better formatting */}
-                </div>
-            </div>
-        </div>
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="max-h-[80vh] overflow-y-auto w-auto">
+                <DialogHeader>
+                    <DialogTitle>Generated Summary</DialogTitle>
+                    <DialogClose />
+                </DialogHeader>
+                <DialogDescription>
+                    <ScrollArea className="p-4 bg-gray-100 rounded-md">
+                        {summary ? (
+                            <div className="whitespace-pre-wrap">
+                                {Object.entries(summary).map(([key, value]) => (
+                                    <div key={key} className="mb-2">
+                                        <strong>{key}:</strong> {typeof value === 'object' ? (
+                                            <ul className="list-disc pl-5">
+                                                {value && Object.entries(value).map(([subKey, subValue]) => (
+                                                    <li key={subKey}>
+                                                        <strong>{subKey}:</strong> {String(subValue)}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <span>{String(value)}</span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p>No summary available.</p>
+                        )}
+                    </ScrollArea>
+                </DialogDescription>
+            </DialogContent>
+        </Dialog>
     );
 };
 
 export function AllPatient() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [data, setData] = useState<{ id: string; date: string; doctor: string; url: string; type: string }[]>([]);
+    const [data, setData] = useState<{ id: string; date: string; doctor: string; url: string; type: string; loading: boolean }[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedDocumentUrl, setSelectedDocumentUrl] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isSummaryModalOpen, setIsSummaryModalOpen] = useState<boolean>(false);
     const [selectedRows, setSelectedRows] = useState<string[]>([]); 
-    const [generatedSummary, setGeneratedSummary] = useState<string | null>(null);  // New state for generated summary
+    const [generatedSummary, setGeneratedSummary] = useState<string | null>(null); 
+    const [isGeneratingAllSummaries, setIsGeneratingAllSummaries] = useState<boolean>(false); // New state for loading summaries for selected rows
     const AadharId = location.state?.aadhaar || '';
 
     useEffect(() => {
@@ -103,6 +117,7 @@ export function AllPatient() {
                         doctor: file.doctor || "Unknown",
                         url: file.url || "#",
                         type: file.type || "Unknown",
+                        loading: false // Initialize loading state for each row
                     }));
                     setData(formattedData);
                 } else {
@@ -117,6 +132,59 @@ export function AllPatient() {
         };
         fetchData();
     }, [AadharId]);
+
+    const generateSummary = async (urls: string[], rowIndex?: number) => {
+        const dataToSend = { pdf_urls: urls };
+
+        if (rowIndex !== undefined) {
+            // Set loading state true for the specific row
+            setData(prev => 
+                prev.map((item, index) =>
+                    index === rowIndex ? { ...item, loading: true } : item
+                )
+            );
+        }
+
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_MODEL_API_URL}/summarize`, dataToSend);
+            console.log("Summaries generated:", response.data);
+
+            if (rowIndex !== undefined) {
+                // Reset loading state for the specific row
+                setData(prev => 
+                    prev.map((item, index) =>
+                        index === rowIndex ? { ...item, loading: false } : item
+                    )
+                );
+            }
+
+            setGeneratedSummary(response.data || ""); 
+            setIsSummaryModalOpen(true);
+        } catch (error) {
+            console.error("Error generating summaries:", error);
+            if (rowIndex !== undefined) {
+                // Reset loading state for the specific row on error
+                setData(prev => 
+                    prev.map((item, index) =>
+                        index === rowIndex ? { ...item, loading: false } : item
+                    )
+                );
+            }
+        }
+    };
+
+    const handleGenerateSummaryForAll = async () => {
+        const urls = selectedRows.map(id => data.find(row => row.id === id)?.url).filter(Boolean);
+        if (urls.length > 0) {
+            setIsGeneratingAllSummaries(true); // Set loading state for generating all summaries
+            try {
+                await generateSummary(urls.filter((url): url is string => !!url)); // Call the summary generation
+            } finally {
+                setIsGeneratingAllSummaries(false); // Reset loading state
+            }
+        }
+    };
+
     const columns: ColumnDef<any>[] = [
         {
             id: "select",
@@ -163,8 +231,15 @@ export function AllPatient() {
             id: "generateSummary",
             header: "Generate Summary",
             cell: ({ row }) => (
-                <Button variant="outline" onClick={() => generateSummary([row.original.url])}>
-                    Generate Summary
+                <Button variant="outline" onClick={() => generateSummary([row.original.url], row.index)} disabled={loading || row.original.loading}>
+                    {row.original.loading ? ( 
+                        <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                    ) : (
+                        "Generate Summary"
+                    )}
                 </Button>
             ),
         },
@@ -178,27 +253,20 @@ export function AllPatient() {
         getSortedRowModel: getSortedRowModel(),
     });
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+    if (loading) return (
+        <div className="flex justify-center items-center">
+            <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <span className="ml-2">Loading...</span>
+        </div>
+    );
 
-    const generateSummary = async (urls: string[]) => {
-        const dataToSend = { pdf_urls: urls };
-    
-        try {
-            const response = await axios.post(`${import.meta.env.VITE_MODEL_API_URL}/summarize`, dataToSend);
-            console.log("Summaries generated:", response.data);
-            // Here you might need to adjust this based on the actual response structure
-            setGeneratedSummary(response.data.summary || ""); // Update this based on your actual API response
-            setIsSummaryModalOpen(true); // Open the summary modal
-        } catch (error) {
-            console.error("Error generating summaries:", error.response ? error.response.data : error.message);
-            alert("Failed to generate summaries. Please try again. " + (error.response ? error.response.data : ""));
-        }
-    };
+    if (error) return <p>{error}</p>;
 
     return (
         <div className="w-full">
-            {/* Back Button */}
             <button className="mt-4 ml-4 p-2 bg-gray-300 hover:bg-gray-500 rounded" onClick={() => navigate(-1)}>
                 🔙 Back
             </button>
@@ -240,21 +308,23 @@ export function AllPatient() {
                 </Table>
             </div>
 
-            {/* Generate Summary Button for Selected */}
             <div className="flex justify-end p-4 pr-10 mr-20">
                 <Button 
                     variant="outline" 
-                    onClick={() => {
-                        const urls = selectedRows.map(id => data.find(row => row.id === id)?.url).filter(Boolean);
-                        generateSummary(urls);
-                    }} 
-                    disabled={selectedRows.length === 0}
+                    onClick={handleGenerateSummaryForAll} 
+                    disabled={selectedRows.length === 0 || isGeneratingAllSummaries}  // Disable if already generating summaries
                 >
-                    Generate Summary for Selected
+                    {isGeneratingAllSummaries ? (
+                        <svg className="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                    ) : (
+                        "Generate Summary for Selected"
+                    )}
                 </Button>
             </div>
 
-            {/* Modal for displaying iframe */}
             <DocumentViewerModal 
                 isOpen={isModalOpen} 
                 onClose={() => {
@@ -264,7 +334,6 @@ export function AllPatient() {
                 url={selectedDocumentUrl} 
             />
 
-            {/* Modal for displaying summary */}
             <SummaryModal 
                 isOpen={isSummaryModalOpen} 
                 onClose={() => {

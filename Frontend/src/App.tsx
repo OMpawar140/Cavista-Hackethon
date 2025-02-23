@@ -10,7 +10,7 @@ import  { Suspense, lazy } from 'react';
 const LoginPage = lazy(() => import('./pages/Authentication/LoginPage'));
 const SignUp = lazy(() => import('./pages/Authentication/SignUp'));
 const AdminDashboard = lazy(() => import("./pages/Admin/adminDashboard"));
-const AdminPanel = lazy(() => import("./pages/Admin/LiveUsers"));
+// const AdminPanel = lazy(() => import("./pages/Admin/LiveUsers"));
 const Searchuser = lazy(() => import("./pages/Admin/searchuser-layout.tsx"));
 const Patient_Details = lazy(() => import("./pages/Admin/allpatientLayout.tsx"));
 const AddNewPatient = lazy(() => import('./pages/Admin/adduser-layout.tsx'));
@@ -33,7 +33,7 @@ export default function App() {
               <Route path="/addnewuser" element={<ProtectedRoute><AddNewPatient /></ProtectedRoute>} />
               <Route path="/page-not-found" element={<NotFound />} />
               <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route  path="/manage-users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+              {/* <Route  path="/manage-users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} /> */}
               <Route path="/Search-User" element={<ProtectedRoute><Searchuser /></ProtectedRoute>} />
               <Route path="/all-patient-details/:aadhaar" element={<ProtectedRoute><Patient_Details /></ProtectedRoute>} />
               <Route path="/new-prescription/:aadhaar" element={<ProtectedRoute><NewPrescip /></ProtectedRoute>} />

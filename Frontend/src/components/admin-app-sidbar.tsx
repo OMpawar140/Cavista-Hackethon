@@ -40,20 +40,20 @@ export function AdminAppSidebar({ userName , userEmail, ...props }: AppSidebarPr
                 icon: SquareTerminal,
                 isActive: true,
             },
+            // {
+            //     title: <Link to={`/manage-users`}>Manage Users</Link>,
+            //     url: "/admin/live-users",
+            //     icon: Book,
+            //     isActive: false,
+            // },
             {
-                title: <Link to={`/manage-users`}>Manage Users</Link>,
-                url: "/admin/live-users",
-                icon: Book,
-                isActive: false,
-            },
-            {
-                title: <Link to={`/Search-User`}>Search Users</Link>,
+                title: <Link to={`/Search-User`}>Search Patient</Link>,
                 url: "/admin/Search-User",
                 icon: Search, 
                 isActive: false,
             },
             {
-                title: <Link to={`/addnewuser`}>Add New User</Link>,
+                title: <Link to={`/addnewuser`}>Add New Patient</Link>,
                 url: "/admin/addnewuser",
                 icon:CirclePlus, 
                 isActive: false,
