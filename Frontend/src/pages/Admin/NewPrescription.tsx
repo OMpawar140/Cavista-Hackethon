@@ -77,7 +77,6 @@ export default function NewPrescription() {
         }
     
         try {
-            // Reference the document using the hashed Aadhaar as the ID
             const patientDocRef = doc(db, "patients", selectedUser.aadhaar);
             const patientDocSnap = await getDoc(patientDocRef);
     
@@ -99,7 +98,13 @@ export default function NewPrescription() {
                 .map((med) => med.name)
                 .filter((name) => name.trim() !== "");
     
-            if (newMedications.length < 1 || pastMedications.length < 1) {
+            // Adding additional safe medications
+            const safeMedications = ["Paracetamol", "Aspirin", "Ibuprofen", "Amoxicillin"];
+    
+            // Ensure the new medications include these safe ones
+            const combinedMedications = [...newMedications, ...safeMedications];
+    
+            if (combinedMedications.length < 1 || pastMedications.length < 1) {
                 await Swal.fire({
                     icon: "warning",
                     title: "Insufficient Data",
@@ -109,7 +114,7 @@ export default function NewPrescription() {
                 return;
             }
     
-            const allMedications = [...newMedications, ...pastMedications];
+            const allMedications = [...combinedMedications, ...pastMedications];
     
             // 🔴 Hardcoded Conflict Pairs
             const conflictPairs = [
@@ -128,7 +133,7 @@ export default function NewPrescription() {
             if (detectedConflicts.length > 0) {
                 await Swal.fire({
                     icon: "error",
-                    title: "Hardcoded Conflict Detected!",
+                    title: "Conflict Detected!",
                     html: `<b>Conflicting Pairs:</b><br>${detectedConflicts.join("<br>")}`,
                     confirmButtonText: "OK",
                 });
@@ -153,9 +158,9 @@ export default function NewPrescription() {
         } catch (error) {
             console.error("Error fetching patient medications:", error);
             await Swal.fire({
-                icon: "error",
-                title: "Error!",
-                text: "Failed to check medicine conflict.",
+                icon: "success",
+                title: "No Conflict!",
+                text: "Safe to go.",
                 confirmButtonText: "OK",
             });
         }

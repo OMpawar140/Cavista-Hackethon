@@ -29,15 +29,16 @@ export default function AddNewPatient() {
   const [bloodReport, setBloodReport] = useState<File | null>(null);
   const [prescription, setPrescription] = useState<File | null>(null);
   const [scans, setScans] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false); 
 
-  const storage = getStorage(); // Initialize Firebase Storage
+  const storage = getStorage(); 
 
   const handleAddPatient = async () => {
     try {
+      setLoading(true); 
       const hashedAadhaar = CryptoJS.SHA256(aadhaar).toString();
       const fileUrls: string[] = [];
 
-      // Function to upload files and get URLs
       const uploadFileAndGetUrl = async (file: File | null, folder: string) => {
         if (!file) return null;
         const fileRef = ref(storage, `${folder}/${file.name}`);
@@ -45,7 +46,6 @@ export default function AddNewPatient() {
         return await getDownloadURL(fileRef);
       };
 
-      // Upload files and get URLs
       const bloodReportUrl = await uploadFileAndGetUrl(bloodReport, 'Sasoon Pune');
       if (bloodReportUrl) fileUrls.push(bloodReportUrl);
 
@@ -54,8 +54,6 @@ export default function AddNewPatient() {
       
       const scansUrl = await uploadFileAndGetUrl(scans, 'Sasoon Pune');
       if (scansUrl) fileUrls.push(scansUrl);
-
-      // Create patient object
       const patientData = {
         name,
         email,
@@ -75,13 +73,8 @@ export default function AddNewPatient() {
         oxygenSaturation,
         fileUrls, 
       };
-
-      // Save to Firestore
       await setDoc(doc(db, "patients", hashedAadhaar), patientData);
-      
       console.log("Patient added successfully:", patientData);
-      
-      // Show success alert
       await Swal.fire({
         title: 'Success!',
         text: 'Patient has been added successfully!',
@@ -89,10 +82,8 @@ export default function AddNewPatient() {
         confirmButtonText: 'OK',
       });
       
-      // Navigate to /Search-User
      navigate('/Search-User');
       
-      // Reset input fields
       resetForm();
       
     } catch (error) {
@@ -103,10 +94,11 @@ export default function AddNewPatient() {
         icon: 'error',
         confirmButtonText: 'OK',
       });
+    } finally {
+      setLoading(false); 
     }
   };
 
-  // Function to reset form
   const resetForm = () => {
     setName("");
     setEmail("");
@@ -135,8 +127,6 @@ export default function AddNewPatient() {
         <h1 className="text-2xl font-semibold text-center mb-4">🧑‍⚕ Add New Patient</h1>
         
         <form className="space-y-4">
-          {/* All your input fields remain unchanged here */}
-          {/* ... Same as before */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium dark:text-white pr-10">
               Name
@@ -368,7 +358,30 @@ export default function AddNewPatient() {
               onClick={handleAddPatient}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Add Patient
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 mr-3 -ml-1 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 016.39-7.94c-.049.155-.09.314-.11.477a6 6 0 102.217 0c-.01-.163-.063-.322-.111-.477A8 8 0 114 12z"
+                  />
+                </svg>
+              ) : (
+                'Add Patient'
+              )}
             </button>
           </div>
         </form>

@@ -117,7 +117,7 @@ export function AllPatient() {
                         doctor: file.doctor || "Unknown",
                         url: file.url || "#",
                         type: file.type || "Unknown",
-                        loading: false // Initialize loading state for each row
+                        loading: false 
                     }));
                     setData(formattedData);
                 } else {
@@ -137,7 +137,6 @@ export function AllPatient() {
         const dataToSend = { pdf_urls: urls };
 
         if (rowIndex !== undefined) {
-            // Set loading state true for the specific row
             setData(prev => 
                 prev.map((item, index) =>
                     index === rowIndex ? { ...item, loading: true } : item
@@ -150,7 +149,6 @@ export function AllPatient() {
             console.log("Summaries generated:", response.data);
 
             if (rowIndex !== undefined) {
-                // Reset loading state for the specific row
                 setData(prev => 
                     prev.map((item, index) =>
                         index === rowIndex ? { ...item, loading: false } : item
@@ -163,7 +161,6 @@ export function AllPatient() {
         } catch (error) {
             console.error("Error generating summaries:", error);
             if (rowIndex !== undefined) {
-                // Reset loading state for the specific row on error
                 setData(prev => 
                     prev.map((item, index) =>
                         index === rowIndex ? { ...item, loading: false } : item
@@ -176,11 +173,11 @@ export function AllPatient() {
     const handleGenerateSummaryForAll = async () => {
         const urls = selectedRows.map(id => data.find(row => row.id === id)?.url).filter(Boolean);
         if (urls.length > 0) {
-            setIsGeneratingAllSummaries(true); // Set loading state for generating all summaries
+            setIsGeneratingAllSummaries(true); 
             try {
-                await generateSummary(urls.filter((url): url is string => !!url)); // Call the summary generation
+                await generateSummary(urls.filter((url): url is string => !!url));
             } finally {
-                setIsGeneratingAllSummaries(false); // Reset loading state
+                setIsGeneratingAllSummaries(false);
             }
         }
     };
@@ -267,7 +264,7 @@ export function AllPatient() {
 
     return (
         <div className="w-full">
-            <button className="mt-4 ml-4 p-2 bg-gray-300 hover:bg-gray-500 rounded" onClick={() => navigate(-1)}>
+            <button className="mt-4 ml-4 p-2 black:bg-gray-300 hover:bg-gray-500 rounded" onClick={() => navigate(-1)}>
                 🔙 Back
             </button>
             <div className="flex items-center py-4 px-10">
