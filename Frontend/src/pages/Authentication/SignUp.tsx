@@ -1,19 +1,19 @@
 import { GalleryVerticalEnd } from "lucide-react"
-// import mit_img from "../../assets/MITAOE Landing IMAGE.jpg"
 import { SignUpForm } from "@/components/signup-from"
-// import College_logo from "../../assets/logo_MITAOE.jpg"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import hospitalsLogo from "../../assets/WhatsApp Image 2025-02-22 at 17.49.02.jpeg"
+import hospitalsLanding from "../../assets/1699275917532.jpeg"
 
 export default function SignUp() {
     return (
             <div className="grid min-h-svh lg:grid-cols-2">
                 <div className="relative hidden bg-muted lg:block">
                     <img
-                        // src={mit_img}
-                        alt=""
-                        className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.9] dark:grayscale"
+                        src={hospitalsLanding}
+                        alt="projectLogo"
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-in-out transform hover:scale-90 dark:brightness-[0.9] dark:grayscale"
                     />
-                    <img  className="absolute left-10 top-10 h-12 w-auto" />
+                    <img src={hospitalsLogo} className="absolute left-10 top-10 h-12 w-auto" />
                 </div>
                 <div className="flex flex-col gap-4 p-6 md:p-10 mj">
                     <div className="flex justify-center gap-2 md:justify-start">
@@ -21,7 +21,7 @@ export default function SignUp() {
                             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
                                 <GalleryVerticalEnd className="size-4" />
                             </div>
-                            Product Name
+                            Kalyan Doc
                         </a>
                     </div>
                     <div className="flex flex-1 items-center justify-center">

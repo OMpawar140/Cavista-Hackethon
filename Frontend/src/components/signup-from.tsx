@@ -241,7 +241,7 @@ export function SignUpForm({
           <Input
             id="name"
             type="text"
-            placeholder="John Doe"
+            placeholder=""
             required
             onChange={handleChange}
           />

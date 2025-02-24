@@ -17,19 +17,24 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
+
 const chartData = [
-    { month: "January", desktop: 186 },
-    { month: "February", desktop: 305 },
-    { month: "March", desktop: 237 },
-    { month: "April", desktop: 73 },
-    { month: "May", desktop: 209 },
-    { month: "June", desktop: 214 },
+    { month: "January", sasoon: 190, rubyHall: 150 },
+    { month: "February", sasoon: 245, rubyHall: 230 },
+    { month: "March", sasoon: 300, rubyHall: 210 },
+    { month: "April", sasoon: 150, rubyHall: 190 },
+    { month: "May", sasoon: 200, rubyHall: 250 },
+    { month: "June", sasoon: 220, rubyHall: 300 },
 ]
 
 const chartConfig = {
-    desktop: {
-        label: "Desktop",
+    sasoon: {
+        label: "Sasoon Clinic",
         color: "hsl(var(--chart-1))",
+    },
+    rubyHall: {
+        label: "Ruby Hall Clinic",
+        color: "hsl(var(--chart-2))",
     },
 } satisfies ChartConfig
 
@@ -37,7 +42,7 @@ export function AdminLineChart() {
     return (
         <Card style={{ height: '390px' }}>
             <CardHeader>
-                <CardTitle>Line Chart - Linear</CardTitle>
+                <CardTitle>Line Chart - Patient Visits</CardTitle>
                 <CardDescription>January - June 2024</CardDescription>
             </CardHeader>
             <CardContent className="mt-8">
@@ -63,9 +68,16 @@ export function AdminLineChart() {
                             content={<ChartTooltipContent hideLabel />}
                         />
                         <Line
-                            dataKey="desktop"
+                            dataKey="sasoon"
                             type="linear"
-                            stroke="var(--color-desktop)"
+                            stroke="var(--color-sasoon)"
+                            strokeWidth={2}
+                            dot={false}
+                        />
+                        <Line
+                            dataKey="rubyHall"
+                            type="linear"
+                            stroke="var(--color-rubyHall)"
                             strokeWidth={2}
                             dot={false}
                         />
@@ -77,7 +89,7 @@ export function AdminLineChart() {
                     Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
                 </div>
                 <div className="leading-none text-muted-foreground">
-                    Showing total visitors for the last 6 months
+                    Showing total patients for the last 6 months
                 </div>
             </CardFooter>
         </Card>

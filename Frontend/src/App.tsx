@@ -10,9 +10,11 @@ import  { Suspense, lazy } from 'react';
 const LoginPage = lazy(() => import('./pages/Authentication/LoginPage'));
 const SignUp = lazy(() => import('./pages/Authentication/SignUp'));
 const AdminDashboard = lazy(() => import("./pages/Admin/adminDashboard"));
-const AdminPanel = lazy(() => import("./pages/Admin/LiveUsers"));
-const Searchuser = lazy(() => import("./pages/Admin/search-patient"));
-const Adduser = lazy(() => import("./pages/Admin/AddNewPatient"));
+// const AdminPanel = lazy(() => import("./pages/Admin/LiveUsers"));
+const Searchuser = lazy(() => import("./pages/Admin/searchuser-layout.tsx"));
+const Patient_Details = lazy(() => import("./pages/Admin/allpatientLayout.tsx"));
+const AddNewPatient = lazy(() => import('./pages/Admin/adduser-layout.tsx'));
+const NewPrescip = lazy(() => import('./pages/Admin/NewPrescriptionlaypout.tsx'));
 
 export default function App() {
   return (
@@ -28,11 +30,13 @@ export default function App() {
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignUp />} />
+              <Route path="/addnewuser" element={<ProtectedRoute><AddNewPatient /></ProtectedRoute>} />
               <Route path="/page-not-found" element={<NotFound />} />
               <Route path="/admin-dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/manage-users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+              {/* <Route  path="/manage-users" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} /> */}
               <Route path="/Search-User" element={<ProtectedRoute><Searchuser /></ProtectedRoute>} />
-              <Route path="/Add-User" element={<ProtectedRoute><Adduser /></ProtectedRoute>} />
+              <Route path="/all-patient-details/:aadhaar" element={<ProtectedRoute><Patient_Details /></ProtectedRoute>} />
+              <Route path="/new-prescription/:aadhaar" element={<ProtectedRoute><NewPrescip /></ProtectedRoute>} />
               <Route path="/" element={<Navigate to="/login" />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

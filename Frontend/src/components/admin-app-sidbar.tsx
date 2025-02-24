@@ -1,5 +1,5 @@
 import * as React from "react"
-import { GalleryVerticalEnd, SquareTerminal, Book, Search } from "lucide-react"
+import { GalleryVerticalEnd, SquareTerminal, Book, Search,CirclePlus} from "lucide-react"
 import { AdminNavMain } from "@/components/admin-nav-main"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
@@ -28,9 +28,9 @@ export function AdminAppSidebar({ userName , userEmail, ...props }: AppSidebarPr
         },
         teams: [
             {
-                name: "Acme Inc",
+                name: "Kalyan Doc",
                 logo: GalleryVerticalEnd,
-                plan: "Enterprise",
+                plan: "Healthcare",
             },
         ],
         navMain: [
@@ -40,16 +40,22 @@ export function AdminAppSidebar({ userName , userEmail, ...props }: AppSidebarPr
                 icon: SquareTerminal,
                 isActive: true,
             },
+            // {
+            //     title: <Link to={`/manage-users`}>Manage Users</Link>,
+            //     url: "/admin/live-users",
+            //     icon: Book,
+            //     isActive: false,
+            // },
             {
-                title: <Link to={`/manage-users`}>Manage Users</Link>,
-                url: "/admin/live-users",
-                icon: Book,
+                title: <Link to={`/Search-User`}>Search Patient</Link>,
+                url: "/admin/Search-User",
+                icon: Search, 
                 isActive: false,
             },
             {
-                title: <Link to={`/Search-User`}>Search Users</Link>,
-                url: "/admin/Search-User",
-                icon: Search, 
+                title: <Link to={`/addnewuser`}>Add New Patient</Link>,
+                url: "/admin/addnewuser",
+                icon:CirclePlus, 
                 isActive: false,
             }
         ],
